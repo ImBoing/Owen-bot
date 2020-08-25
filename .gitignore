@@ -1,0 +1,7 @@
+# Dependencies
+node_modules
+
+# Vulnerable Info
+config.json
+package-lock.json
+package.json
