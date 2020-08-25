@@ -1,6 +1,6 @@
 /* eslint-disable consistent-return */
 const { Client, Collection } = require('discord.js');
-const Handler = require('./handlers/cmdHandler.js');
+const Handler = require('./handlers/fileHandler.js');
 
 module.exports = class OwenClient extends Client {
 
@@ -12,40 +12,11 @@ module.exports = class OwenClient extends Client {
 
 		this.commands = new Collection();
 
-		this.aliases = new Collection();
+        this.aliases = new Collection();
+        
+        this.events = new Collection();
 
 		this.Handlers = new Handler(this);
-
-		this.once('ready', () => {
-			console.log(`Logged in as ${this.user.username}`);
-		});
-
-		this.on('message', async (message) => {
-			const prefix = '?';
-			if (message.author.bot) return;
-			if (message.content.startsWith(prefix)) {
-				const [...args] = message.content
-					.slice(prefix.length)
-					.trim()
-					.split(/ +/g);
-				const cmd = args.shift().toLowerCase();
-				const command =
-          this.commands.get(cmd.toLowerCase()) ||
-          this.commands.get(this.aliases.get(cmd.toLowerCase()));
-
-				if (command) {
-					if (command.perms && !message.member.hasPermission(command.perms)) {
-						return message.channel.send(
-							`You are missing the \`${command.perms[0]}\` permission. Make sure you have the required permissions before running the command again.`
-						);
-					} else if (command.missingArgs && !args[0]) {
-						return message.channel.send(command.missingArgs);
-					} else {
-						command.run(message, args);
-					}
-				}
-			}
-		});
 	}
 
 	validate(options) {
@@ -60,7 +31,8 @@ module.exports = class OwenClient extends Client {
 	}
 
 	async start(token = this.token) {
-		this.Handlers.loadCommands();
+        this.Handlers.loadCommands();
+        this.Handlers.loadEvents();
 		super.login(token);
 	}
 
