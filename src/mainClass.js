@@ -12,9 +12,9 @@ module.exports = class OwenClient extends Client {
 
 		this.commands = new Collection();
 
-        this.aliases = new Collection();
-        
-        this.events = new Collection();
+		this.aliases = new Collection();
+
+		this.events = new Collection();
 
 		this.Handlers = new Handler(this);
 	}
@@ -31,8 +31,8 @@ module.exports = class OwenClient extends Client {
 	}
 
 	async start(token = this.token) {
-        this.Handlers.loadCommands();
-        this.Handlers.loadEvents();
+		this.Handlers.loadCommands();
+		this.Handlers.loadEvents();
 		super.login(token);
 	}
 
