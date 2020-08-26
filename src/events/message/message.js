@@ -6,6 +6,7 @@ module.exports = class Message extends BaseEvent {
 	async run(message) {
 		const prefix = '?';
 		if (message.author.bot) return;
+		if (!message.guild && message.channel.type === 'dm') { this.client.emit('directMessage', message); }
 		if (message.content.startsWith(prefix)) {
 			const [...args] = message.content
 				.slice(prefix.length)
@@ -13,8 +14,8 @@ module.exports = class Message extends BaseEvent {
 				.split(/ +/g);
 			const cmd = args.shift().toLowerCase();
 			const command =
-          this.client.commands.get(cmd.toLowerCase()) ||
-          this.client.commands.get(this.client.aliases.get(cmd.toLowerCase()));
+        this.client.commands.get(cmd.toLowerCase()) ||
+        this.client.commands.get(this.client.aliases.get(cmd.toLowerCase()));
 
 			if (command) {
 				if (command.perms && !message.member.hasPermission(command.perms)) {
