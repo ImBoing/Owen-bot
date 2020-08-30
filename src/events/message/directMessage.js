@@ -1,29 +1,31 @@
 const BaseEvent = require('../../models/GenericEvent');
-const { pages } = require('../../utils/pages');
+const { pages, confirm } = require('../../utils/modmail');
 
 module.exports = class directMessage extends BaseEvent {
 
 	async run(message) {
+		console.log('hello');
 		const { client } = this;
 		const messages = await message.channel.messages.fetch({ limit: 25 });
-		const botmessages = messages.filter(
-			(msg) => msg.author.id === this.client.user.id);
 
-		console.log(botmessages);
 
-		if (botmessages.size >= 1) {
+		if (messages.size >= 1) {
 			console.log('Possible guild communication');
 			const a = [];
-			for (const [, msgs] of botmessages) {
-				if (msgs.embeds[0].title === 'Message Sent' || msgs.embeds[0].title === 'Message Recieved') {
-					const tEmbed = msgs.embeds[0];
-					a.push(tEmbed);
-				}
+			for (const [, msgs] of messages) {
+				if (msgs.embeds[0] &&
+					msgs.author.id === this.client.user.id &&
+					msgs.embeds[0].title === 'Message Sent'
+				) { a.push(msgs.embeds[0]); }
 			}
 			if (a.length >= 1) {
+				console.log('confirm');
+				await confirm(message, a[0].footer.text, client);
+			} else {
+				console.log('Hello');
 				await pages(message, client);
 			}
-		} else if (!botmessages) {
+		} else if (!messages) {
 			console.log('No previous guild communitcation');
 		}
 	}

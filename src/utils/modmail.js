@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable id-length */
 const { MessageEmbed } = require('discord.js');
 async function pages(message, client) {
@@ -63,5 +64,29 @@ async function pages(message, client) {
 	});
 }
 
+async function confirm(message, guild, client) {
+	const info = client.guilds.cache.get(guild);
+	const heh = new MessageEmbed()
+		.setColor('BLUE')
+		.setTitle('Confirm')
+		.setDescription(`You are now sending your message to **${info.name}** (ID: ${info.id}). React with ✅ to confim, react with 🔀 to select a different guild, react with ❌ to cancel the confrimation.`);
+	const check = await message.channel.send(heh);
+	await check.react('✅');
+	await check.react('🔀');
+	await check.react('❌');
 
-module.exports = { pages };
+	const filter = (reaction, user) =>
+		['✅', '🔀', '❌'].includes(reaction.emoji.name) &&
+			message.author.id === user.id;
+
+	const collector = check.createReactionCollector(filter);
+
+	collector.on('collect', (reaction) => {
+		if (reaction.emoji.name === '🔀') {
+			check.edit();
+		}
+	});
+}
+
+
+module.exports = { pages, confirm };
